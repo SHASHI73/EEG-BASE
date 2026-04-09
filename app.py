@@ -171,8 +171,13 @@ def load_model_weights():
         model.load_weights("best_model.weights.h5")
         return model
     except:
-        st.error("Model weights not found. Please ensure 'best_model.weights.h5' exists.")
-        return None
+        try:
+            # Try loading as full model if weights format fails
+            model = keras.models.load_model("best_model.h5", custom_objects={'AttentionLayer': AttentionLayer})
+            return model
+        except:
+            st.error("Model weights not found. Please ensure 'best_model.weights.h5' or 'best_model.h5' exists.")
+            return None
 
 
 # ═══════════════════════════════════════════════════════════════
