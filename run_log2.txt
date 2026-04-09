@@ -1,0 +1,72 @@
+﻿python : 2026-04-04 
+01:28:49.540661: I tensorf
+low/core/util/port.cc:153]
+ oneDNN custom operations 
+are on. You may see 
+slightly different 
+numerical results due to 
+floating-point round-off 
+errors from different 
+computation orders. To 
+turn them off, set the 
+environment variable 
+`TF_ENABLE_ONEDNN_OPTS=0`.
+At line:1 char:1
++ python main.py 2>&1 | 
+Out-File -FilePath 
+run_log2.txt -Encoding 
+utf8; ...
++ ~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (2  
+  026-04-04 01:2...ONED   
+ NN_OPTS=0`.:String) [    
+], RemoteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+2026-04-04 
+01:28:51.870455: I tensorf
+low/core/util/port.cc:153]
+ oneDNN custom operations 
+are on. You may see 
+slightly different 
+numerical results due to 
+floating-point round-off 
+errors from different 
+computation orders. To 
+turn them off, set the 
+environment variable 
+`TF_ENABLE_ONEDNN_OPTS=0`.
+
+[INFO] Loading data...
+Found 241 files
+Total samples: 240
+Total subjects: 20
+
+[INFO] Padding signals...
+Data shape after padding: (240, 44164, 4)
+
+[INFO] Splitting dataset...
+Train samples: 168
+Test samples: 72
+
+[INFO] Creating training pairs...
+[INFO] Creating testing pairs...
+Train pairs: 792
+Test pairs: 168
+
+[INFO] Saving pairs...
+
+[DONE] Dataset preparation COMPLETE!
+RECORDS.txt
+s01_ex01_s01.csv
+s01_ex01_s02.csv
+s01_ex01_s03.csv
+s01_ex02_s01.csv
+s01_ex02_s02.csv
+s01_ex02_s03.csv
+s01_ex05.csv
+s01_ex06.csv
+s01_ex07.csv
