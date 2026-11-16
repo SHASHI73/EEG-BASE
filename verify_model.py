@@ -26,6 +26,8 @@ class AttentionLayer(keras.layers.Layer):
         return K.sum(out, axis=1)
     def compute_output_shape(self, input_shape):
         return (input_shape[0], input_shape[-1])
+    def get_config(self):
+        return super(AttentionLayer, self).get_config()
 
 def build_model():
     inputs = Input(shape=(256, 4))

@@ -165,19 +165,54 @@ def build_model(n_classes=24, n_samples=256, n_channels=4, dropout=0.4, lr=0.001
 # ═══════════════════════════════════════════════════════════════
 @st.cache_resource
 def load_model_weights():
-    """Load trained model"""
+    """Load trained model with multi-format fallback support"""
     model = build_model()
-    try:
-        model.load_weights("best_model.weights.h5")
-        return model
-    except:
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    weights_path = os.path.join(base_dir, "best_model.weights.h5")
+    full_model_path = os.path.join(base_dir, "best_model.h5")
+
+    # 1. Attempt standard weights loading
+    if os.path.exists(weights_path):
         try:
-            # Try loading as full model if weights format fails
-            model = keras.models.load_model("best_model.h5", custom_objects={'AttentionLayer': AttentionLayer})
+            model.load_weights(weights_path)
             return model
-        except:
-            st.error("Model weights not found. Please ensure 'best_model.weights.h5' or 'best_model.h5' exists.")
-            return None
+        except Exception:
+            # 2. Fallback for Keras 3 saved weights structure under TF 2.x
+            try:
+                import h5py
+                with h5py.File(weights_path, 'r') as f:
+                    if 'layers' in f:
+                        for layer in model.layers:
+                            lname = layer.name
+                            target = 'attention_layer' if lname == 'attention' and 'attention_layer' in f['layers'] else ('dense_2' if lname == 'output' and 'dense_2' in f['layers'] else lname)
+                            if target in f['layers']:
+                                lgrp = f['layers'][target]
+                                if isinstance(layer, Bidirectional):
+                                    fw_k = np.array(lgrp['forward_layer/cell/vars/0'])
+                                    fw_rk = np.array(lgrp['forward_layer/cell/vars/1'])
+                                    fw_b = np.array(lgrp['forward_layer/cell/vars/2'])
+                                    bw_k = np.array(lgrp['backward_layer/cell/vars/0'])
+                                    bw_rk = np.array(lgrp['backward_layer/cell/vars/1'])
+                                    bw_b = np.array(lgrp['backward_layer/cell/vars/2'])
+                                    layer.set_weights([fw_k, fw_rk, fw_b, bw_k, bw_rk, bw_b])
+                                elif len(layer.weights) > 0 and 'vars' in lgrp:
+                                    var_keys = sorted(list(lgrp['vars'].keys()), key=lambda x: int(x))
+                                    weights = [np.array(lgrp['vars'][k]) for k in var_keys]
+                                    layer.set_weights(weights)
+                        return model
+            except Exception:
+                pass
+
+    # 3. Attempt loading full saved model
+    if os.path.exists(full_model_path):
+        try:
+            model = keras.models.load_model(full_model_path, custom_objects={'AttentionLayer': AttentionLayer})
+            return model
+        except Exception:
+            pass
+
+    st.error("Model weights not found or could not be loaded. Please ensure 'best_model.weights.h5' or 'best_model.h5' exists.")
+    return None
 
 
 # ═══════════════════════════════════════════════════════════════

@@ -1,0 +1,8 @@
+venv/
+__pycache__/
+*.pyc
+*.backup.h5
+desktop.ini
+.vscode/
+run_log*.txt
+run_output.txt
